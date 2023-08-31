@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cycles</title>
+  </head>
+  <body>
+    <table>
+      <tr>
+        <th>id</th>
+        <th>brand</th>
+        <th>color</th>
+        <th>isAvailable</th>
+      </tr>
+      <tr th:each="cycle : ${cycles}">
+        <td th:text="${cycle.id}"></td>
+        <td th:text="${cycle.brand}"></td>
+        <td th:text="${cycle.color}"></td>
+        <div th:if="${cycle.isAvailable}">
+          <td>YES</td>
+        </div>
+        <div th:unless="${cycle.isAvailable}">
+          <td>NO</td>
+        </div>
+      </tr>
+    </table>
+  </body>
+</html>

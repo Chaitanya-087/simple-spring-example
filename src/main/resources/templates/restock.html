@@ -25,7 +25,7 @@
       justify-content: center;
       width: 100%;
       max-width: 90%;
-      gap: 0.5rem;
+      gap: 2rem;
       padding-block: 1rem;
     }
     input::placeholder,
@@ -89,13 +89,14 @@
       text-align: left;
       font-size: 18px;
     }
+
     #details th {
       background-color: #1877f2;
       color: white;
       cursor: pointer;
     }
     .borrow,
-    .return {
+    .restock {
       cursor: pointer;
       font-size: 14px;
       border-radius: 4px;
@@ -109,25 +110,77 @@
       text-align: center;
       color: white;
     }
+    #restock-form {
+      display: flex;
+      gap: 0.5rem;
+    }
+    #restock-form input {
+      width: 60px;
+      text-align: center;
+      background-color: transparent;
+      outline: none;
+      border: 2px solid #ccc;
+      border-radius: 0.25rem;
+    }
     .borrow {
       background-color: #4caf50;
     }
 
-    .return {
+    .restock {
       background-color: #f44336;
     }
   </style>
   <body>
     <main>
-      <h1>Cyclezzzzzzzz</h1>
+      <h1>restock or add new cycle</h1>
+      <form
+        id="cycle-form"
+        action="#"
+        th:action="@{/shop/add}"
+        method="post"
+        th:object="${cycle}"
+      >
+        <div class="input-group">
+          <label for="brand">brand</label>
+          <input
+            type="text"
+            name="brand"
+            class="cycle-input"
+            id="brand"
+            th:field="*{brand}"
+            required
+          />
+        </div>
+        <div class="input-group">
+          <label for="color">color</label>
+          <input
+            type="text"
+            name="color"
+            class="cycle-input"
+            id="color"
+            th:field="*{color}"
+            required
+          />
+        </div>
+        <div class="input-group">
+          <label for="quantity">quantity</label>
+          <input
+            class="cycle-input"
+            type="number"
+            min="1"
+            id="quantity"
+            th:field="*{quantity}"
+          />
+        </div>
+        <button type="submit" class="add-button">add</button>
+      </form>
       <table id="details">
         <tr>
           <th>id</th>
           <th>brand</th>
           <th>color</th>
           <th>quantity</th>
-          <th>borrow</th>
-          <th>return</th>
+          <th>restock</th>
         </tr>
         <tr th:each="cycle : ${cycles}">
           <td th:text="${cycle.id}"></td>
@@ -138,35 +191,17 @@
             <form
               action="#"
               method="post"
-              th:action="@{/shop/borrow/{id}(id = ${cycle.id})}"
+              th:action="@{/shop/restock/{id}(id = ${cycle.id})}"
+              id="restock-form"
             >
-              <button class="borrow" type="submit">
-                <span>borrow</span>
-              </button>
-            </form>
-          </td>
-          <td>
-            <form
-              action="#"
-              method="post"
-              th:action="@{/shop/return/{id}(id = ${cycle.id})}"
-            >
-              <button class="return" type="submit">
-                <span>return</span>
+              <input type="number" min="1" name="quantity" value="1" />
+              <button class="restock" type="submit">
+                <span>restock</span>
               </button>
             </form>
           </td>
         </tr>
       </table>
     </main>
-    <!-- <script>
-      if (document.querySelector("#qty").innerText === "0") {
-        document.querySelector(".borrow").disabled = true;
-        document.querySelector(".borrow").style.backgroundColor = "#ccc";
-      } else {
-        document.querySelector(".borrow").disabled = false;
-        document.querySelector(".borrow").style.backgroundColor = "#4caf50";
-      }
-    </script> -->
   </body>
 </html>

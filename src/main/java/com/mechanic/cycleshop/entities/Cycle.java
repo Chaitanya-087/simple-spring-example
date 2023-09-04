@@ -17,6 +17,5 @@ public class Cycle {
     private int id;
     private String color;
     private String brand;
-
-    private boolean isAvailable = true;
+    private int quantity = 1;
 }

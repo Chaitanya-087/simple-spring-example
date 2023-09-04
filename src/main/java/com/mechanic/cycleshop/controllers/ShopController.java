@@ -10,70 +10,79 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.mechanic.cycleshop.entities.Cycle;
 import com.mechanic.cycleshop.repositories.CyclesRepository;
 
-
 @Controller
 @RequestMapping("/shop")
 public class ShopController {
-    
+
     @Autowired
     private CyclesRepository shopRepository;
 
-    @GetMapping
-    public String home(Model model) {
+    @GetMapping("/restock")
+    public String restock(Model model) {
+        model.addAttribute("cycle", new Cycle());
         model.addAttribute("cycles", shopRepository.findAll());
+        return "restock";
+    }
+
+    @GetMapping("/list")
+    public String home(Model model) {
+        model.addAttribute("cycles", shopRepository.findAllCyclesByQuantityGreaterThan(0));
         return "cycles";
     }
 
-    @GetMapping("/cycle/form")
-    public String addCycle(Model model) {
-        model.addAttribute("cycle", new Cycle());
-        return "addForm";
-    }
-
-    @PostMapping("/cycle/add")
+    @PostMapping("/add")
     public String addCycle(@ModelAttribute("cycle") Cycle cycle) {
         Cycle c = new Cycle();
         c.setBrand(cycle.getBrand());
         c.setColor(cycle.getColor());
         shopRepository.save(cycle);
 
-        return "redirect:/shop/showAllAvailableCycles";
+        return "redirect:/shop/restock";
     }
 
-    @GetMapping("/showAllAvailableCycles")
-    public String showAvailableCycles(Model model) {
-        model.addAttribute("cycles", shopRepository.findByAvailable(true));
-        return "cycles";
-    }
-
-    @GetMapping("/borrowCycle/{id}")
+    @PostMapping("/borrow/{id}")
     public String borrowCycle(@PathVariable int id) {
         Optional<Cycle> cycle = shopRepository.findById(id);
-        
+
         if (cycle.isPresent()) {
             Cycle c = cycle.get();
-            c.setAvailable(false);
+            c.setQuantity(c.getQuantity() - 1);
             shopRepository.save(c);
         }
 
-        return "redirect:/shop/showAllAvailableCycles";
+        return "redirect:/shop/list";
     }
 
-    @GetMapping("/returnCycle/{id}")
+    //fishy
+    @PostMapping("/return/{id}")
     public String returnCycle(@PathVariable int id) {
+        Optional<Cycle> cycle = shopRepository.findById(id);
+
+        if (cycle.isPresent()) {
+            Cycle c = cycle.get();
+            c.setQuantity(c.getQuantity() + 1);
+            shopRepository.save(c);
+        }
+
+        return "redirect:/shop/list";
+    }
+
+    @PostMapping("/restock/{id}")
+    public String returnCycle(@PathVariable int id, @RequestParam("quantity") int quantity) {
 
         Optional<Cycle> cycle = shopRepository.findById(id);
 
         if (cycle.isPresent()) {
             Cycle c = cycle.get();
-            c.setAvailable(true);
+            c.setQuantity(c.getQuantity() + quantity);
             shopRepository.save(c);
         }
-        
-        return "redirect:/shop/showAllAvailableCycles";
+
+        return "redirect:/shop/restock";
     }
 }
